@@ -1,13 +1,35 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { 
+    StyleSheet, 
+    Text, 
+    View, 
+    TextInput, 
+    TouchableOpacity, 
+    Keyboard } from "react-native";
 import React, {useState} from "react";
 import firebase from "../database/firebaseDB";
 
-// const auth = firebase.auth();
+
+const auth = firebase.auth();
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorText, setErrorText] = useState("");
 
+  function login (){
+    Keyboard.dismiss();
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        console.log("Signed in!")
+        navigation.navigate("Chat", {email});
+      })
+      .catch((error) => {
+        console.log("Error!");
+        console.log(error.message);
+        setErrorText(error.message);
+      });
+  }
 return (
     // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -32,10 +54,10 @@ return (
           value={password}
           onChangeText={(text) => setPassword(text)}
         />
-        <TouchableOpacity onPress={null} style={styles.loginButton}>
+        <TouchableOpacity onPress={login} style={styles.loginButton}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
-        <Text style={styles.errorText}>{null}</Text>
+        <Text style={styles.errorText}>{errorText}</Text>
       </View>
     // </TouchableWithoutFeedback>
   );
@@ -80,6 +102,7 @@ const styles = StyleSheet.create({
     },
     errorText: {
       color: "red",
+      marginVertical: 20,
       height: 40,
     },
 });
